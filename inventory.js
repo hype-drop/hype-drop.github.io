@@ -1580,47 +1580,6 @@ window.INVENTORY = [
     "stockx": "https://stockx.com/it-it/nike-dunk-low-st-johns-2020"
   },
   {
-    "name": "SUPREME SWEATSHIRT BLING BOX LOGO DARK BROWN",
-    "size": "M",
-    "resell": 250,
-    "brand": "Supreme",
-    "image": "https://image.goat.com/750/attachments/product_template_pictures/images/068/602/946/original/902547_00.png.png",
-    "images": [
-      "https://image.goat.com/750/attachments/product_template_pictures/images/068/602/946/original/902547_00.png.png",
-      "https://image.goat.com/attachments/product_template_additional_pictures/images/068/602/949/medium/902547_01.jpg.jpeg",
-      "https://image.goat.com/attachments/product_template_additional_pictures/images/068/349/286/medium/902547_02.jpg.jpeg",
-      "https://image.goat.com/attachments/product_template_additional_pictures/images/068/602/950/medium/902547_03.jpg.jpeg"
-    ],
-    "stockx": "https://stockx.com/it-it/supreme-bling-box-logo-hooded-sweatshirt-dark-brown?size=M"
-  },
-  {
-    "name": "SUPREME SWEATSHIRT BOX LOGO FW 21 ROSA",
-    "size": "M",
-    "resell": 300,
-    "brand": "Supreme",
-    "image": "https://image.goat.com/750/attachments/product_template_pictures/images/064/822/937/original/861812_00.png.png",
-    "images": [
-      "https://image.goat.com/750/attachments/product_template_pictures/images/064/822/937/original/861812_00.png.png",
-      "https://image.goat.com/attachments/product_template_additional_pictures/images/064/822/941/medium/861812_01.jpg.jpeg",
-      "https://image.goat.com/attachments/product_template_additional_pictures/images/064/822/944/medium/861812_02.jpg.jpeg",
-      "https://image.goat.com/attachments/product_template_additional_pictures/images/064/822/948/medium/861812_03.jpg.jpeg"
-    ],
-    "stockx": "https://stockx.com/it-it/supreme-box-logo-hooded-sweatshirt-fw21-pink"
-  },
-  {
-    "name": "SUPREME SWEATSHIRT BURBERRY BOX LOGO",
-    "size": "M",
-    "resell": 400,
-    "brand": "Supreme",
-    "image": "https://image.goat.com/750/attachments/product_template_pictures/images/069/063/982/original/911108_00.png.png",
-    "images": [
-      "https://image.goat.com/750/attachments/product_template_pictures/images/069/063/982/original/911108_00.png.png",
-      "https://image.goat.com/attachments/product_template_additional_pictures/images/069/063/984/medium/911108_01.jpg.jpeg",
-      "https://image.goat.com/attachments/product_template_additional_pictures/images/069/058/957/medium/911108_03.jpg.jpeg"
-    ],
-    "stockx": "https://stockx.com/it-it/supreme-burberry-box-logo-hooded-sweatshirt-heather-grey"
-  },
-  {
     "name": "AIR MAX PATTA CLOROPHYL",
     "size": "44.5",
     "resell": 200,
@@ -1681,5 +1640,46 @@ window.INVENTORY = [
       "https://image.goat.com/attachments/product_template_additional_pictures/images/062/992/375/medium/789219_12.jpg.jpeg"
     ],
     "stockx": "https://stockx.com/it-it/air-jordan-2-retro-low-sp-off-white-black-blue"
+  },
+  {
+    "name": "SUPREME SWEATSHIRT BLING BOX LOGO DARK BROWN",
+    "size": "M",
+    "resell": 250,
+    "brand": "Supreme",
+    "image": "https://image.goat.com/750/attachments/product_template_pictures/images/068/602/946/original/902547_00.png.png",
+    "images": [
+      "https://image.goat.com/750/attachments/product_template_pictures/images/068/602/946/original/902547_00.png.png",
+      "https://image.goat.com/attachments/product_template_additional_pictures/images/068/602/949/medium/902547_01.jpg.jpeg",
+      "https://image.goat.com/attachments/product_template_additional_pictures/images/068/349/286/medium/902547_02.jpg.jpeg",
+      "https://image.goat.com/attachments/product_template_additional_pictures/images/068/602/950/medium/902547_03.jpg.jpeg"
+    ],
+    "stockx": "https://stockx.com/it-it/supreme-bling-box-logo-hooded-sweatshirt-dark-brown?size=M"
+  },
+  {
+    "name": "SUPREME SWEATSHIRT BOX LOGO FW 21 ROSA",
+    "size": "M",
+    "resell": 300,
+    "brand": "Supreme",
+    "image": "https://image.goat.com/750/attachments/product_template_pictures/images/064/822/937/original/861812_00.png.png",
+    "images": [
+      "https://image.goat.com/750/attachments/product_template_pictures/images/064/822/937/original/861812_00.png.png",
+      "https://image.goat.com/attachments/product_template_additional_pictures/images/064/822/941/medium/861812_01.jpg.jpeg",
+      "https://image.goat.com/attachments/product_template_additional_pictures/images/064/822/944/medium/861812_02.jpg.jpeg",
+      "https://image.goat.com/attachments/product_template_additional_pictures/images/064/822/948/medium/861812_03.jpg.jpeg"
+    ],
+    "stockx": "https://stockx.com/it-it/supreme-box-logo-hooded-sweatshirt-fw21-pink"
+  },
+  {
+    "name": "SUPREME SWEATSHIRT BURBERRY BOX LOGO",
+    "size": "M",
+    "resell": 400,
+    "brand": "Supreme",
+    "image": "https://image.goat.com/750/attachments/product_template_pictures/images/069/063/982/original/911108_00.png.png",
+    "images": [
+      "https://image.goat.com/750/attachments/product_template_pictures/images/069/063/982/original/911108_00.png.png",
+      "https://image.goat.com/attachments/product_template_additional_pictures/images/069/063/984/medium/911108_01.jpg.jpeg",
+      "https://image.goat.com/attachments/product_template_additional_pictures/images/069/058/957/medium/911108_03.jpg.jpeg"
+    ],
+    "stockx": "https://stockx.com/it-it/supreme-burberry-box-logo-hooded-sweatshirt-heather-grey"
   }
 ];
