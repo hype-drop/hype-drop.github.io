@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PM Resell — Inventario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <script src="./inventory.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #f5f5f5;
+      --surface: #ffffff;
+      --surf2:   #ebebeb;
+      --border:  #d8d8d8;
+      --text:    #0c0c0c;
+      --muted:   #888888;
+      --green:   #18a84a;
+      --gold:    #b5912a;
+      --radius:  8px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ────────────────────────────────────────────── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(245,245,245,.94);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+
+    .nav-top {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      height: 62px;
+    }
+
+    /* ── Logo ── */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .logo-svg { width: 46px; height: 28px; }
+    .logo-wordmark {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+      gap: 1px;
+    }
+    .logo-pm {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .22em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .logo-resell {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .logo-resell span { color: var(--gold); }
+
+    /* ── Brand pills ── */
+    .brand-filters {
+      display: flex;
+      gap: 6px;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .brand-filters::-webkit-scrollbar { display: none; }
+
+    .pill {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .16s;
+    }
+    .pill:hover { border-color: var(--text); color: var(--text); }
+    .pill.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+    /* ── Search ── */
+    .search-wrap { position: relative; flex-shrink: 0; }
+    .search-icon {
+      position: absolute;
+      left: 10px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    #search {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      padding: 8px 12px 8px 32px;
+      width: 200px;
+      outline: none;
+      transition: border-color .16s;
+    }
+    #search:focus { border-color: var(--muted); }
+    #search::placeholder { color: var(--muted); }
+
+    /* ── Size + price row ── */
+    .nav-bottom {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 8px 0 10px;
+      border-top: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .nav-bottom::-webkit-scrollbar { display: none; }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .size-chips {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .size-chips::-webkit-scrollbar { display: none; }
+
+    .chip {
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .16s;
+    }
+    .chip:hover { border-color: var(--text); color: var(--text); }
+    .chip.active { background: var(--surf2); border-color: var(--gold); color: var(--gold); }
+
+    .sort-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      padding: 5px 10px;
+      outline: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .sort-select:focus { border-color: var(--muted); }
+
+    .price-range {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .price-input {
+      width: 74px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 12px;
+      padding: 5px 8px;
+      outline: none;
+    }
+    .price-input:focus { border-color: var(--muted); }
+    .price-sep { color: var(--muted); font-size: 12px; }
+
+    /* ── GRID ──────────────────────────────────────────────── */
+    main { padding: 24px; }
+
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 1100px) { #grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 740px)  { #grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 420px)  { #grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+    /* Brand filters: desktop mostra #brandFilters, mobile mostra #brandFiltersMobile */
+    #brandFiltersMobile { display: none; }
+    @media (max-width: 600px) {
+      #brandFilters       { display: none; }
+      #brandFiltersMobile { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; }
+      #brandFiltersMobile::-webkit-scrollbar { display: none; }
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .2s, border-color .2s, filter .2s;
+      position: relative;
+    }
+    .card:hover {
+      transform: scale(1.025);
+      border-color: #3c3c3c;
+      filter: brightness(1.08);
+    }
+
+    .card-img-wrap {
+      position: relative;
+      aspect-ratio: 1;
+      background: #fff;
+      overflow: hidden;
+    }
+    .card-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      display: block;
+      transition: opacity .3s;
+    }
+    .card-img-wrap img.loading { opacity: 0; }
+
+    .badge {
+      position: absolute;
+      top: 8px; left: 8px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    /* ── Card size dots ── */
+    .card-sizes {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 3px;
+      max-width: 80px;
+    }
+    .card-size-dot {
+      background: rgba(0,0,0,.55);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 4px;
+      border-radius: 3px;
+      line-height: 1.2;
+      backdrop-filter: blur(4px);
+    }
+
+    .card-body { padding: 10px 12px 13px; }
+    .card-name {
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text);
+      margin-bottom: 7px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-price { font-size: 14px; font-weight: 700; color: var(--green); }
+    .card-price-prefix { font-size: 10px; font-weight: 500; color: var(--muted); margin-right: 2px; }
+
+    /* No results */
+    #empty {
+      display: none;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    #empty svg { opacity: .25; margin-bottom: 14px; }
+    #empty p { font-size: 14px; }
+
+    /* ── MODAL ─────────────────────────────────────────────── */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,.86);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+      overflow-y: auto;
+    }
+    #modal-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+
+    #modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 880px;
+      margin: auto;
+      overflow: hidden;
+      position: relative;
+      animation: slideUp .24s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 640px) { .modal-layout { grid-template-columns: 1fr; } }
+
+    /* ── Carousel ── */
+    .modal-img-wrap {
+      position: relative;
+      aspect-ratio: 1;
+      background: #fff;
+      overflow: hidden;
+    }
+    .modal-img-wrap img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      display: block;
+      transition: opacity .25s;
+    }
+    .modal-img-wrap img.fade { opacity: 0; }
+
+    .carousel-btn {
+      position: absolute;
+      top: 50%; transform: translateY(-50%);
+      z-index: 5;
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 50%;
+      color: var(--text);
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      transition: background .16s;
+      user-select: none;
+    }
+    .carousel-btn:hover { background: rgba(0,0,0,.8); }
+    .carousel-btn.prev { left: 10px; }
+    .carousel-btn.next { right: 10px; }
+    .carousel-btn[hidden] { display: none; }
+
+    .carousel-dots {
+      position: absolute;
+      bottom: 10px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 5px;
+    }
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.3);
+      cursor: pointer;
+      transition: background .16s, transform .16s;
+    }
+    .dot.active {
+      background: var(--gold);
+      transform: scale(1.3);
+    }
+
+    /* ── Modal right panel ── */
+    .modal-info {
+      padding: 26px 26px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow-y: auto;
+      max-height: 580px;
+    }
+
+    .modal-brand {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .modal-name {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+    .modal-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .modal-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .sizes-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    .size-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 7px 11px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surf2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .16s;
+      min-width: 52px;
+    }
+    .size-btn:not(.unavailable):hover {
+      border-color: var(--green);
+      background: rgba(46,204,113,.08);
+    }
+    .size-btn.selected {
+      border-color: var(--green);
+      background: rgba(46,204,113,.13);
+    }
+    .size-btn.unavailable {
+      opacity: .28;
+      cursor: not-allowed;
+    }
+    .size-btn .sz { font-size: 13px; font-weight: 600; color: var(--text); }
+    .size-btn .pr { font-size: 11px; color: var(--green); margin-top: 2px; font-weight: 600; }
+    .size-btn.unavailable .pr { color: var(--muted); }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+    .btn-wa {
+      flex: 1;
+      padding: 12px;
+      border-radius: var(--radius);
+      border: none;
+      background: var(--green);
+      color: #000;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      letter-spacing: .04em;
+      transition: opacity .16s;
+    }
+    .btn-wa:hover { opacity: .84; }
+    .btn-close-modal {
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .16s;
+    }
+    .btn-close-modal:hover { border-color: var(--text); color: var(--text); }
+
+    .modal-close-x {
+      position: absolute;
+      top: 12px; right: 12px;
+      z-index: 10;
+      background: rgba(0,0,0,.6);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 50%;
+      width: 30px; height: 30px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--text);
+      font-size: 14px;
+      transition: background .16s;
+    }
+    .modal-close-x:hover { background: rgba(0,0,0,.85); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────────── -->
+<header>
+  <div class="nav-top">
+
+    <!-- Logo -->
+    <a class="logo" href="#" style="text-decoration:none; line-height:1; display:flex; flex-direction:column; gap:0;">
+      <span style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:.08em; color:var(--text);">HYPE</span>
+      <span style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:.08em; color:transparent; -webkit-text-stroke:1.5px var(--text);">DROP</span>
+    </a>
+
+    <!-- Brand filters — desktop only -->
+    <div class="brand-filters" id="brandFilters">
+      <button class="pill active" data-brand="all">Tutti</button>
+      <button class="pill" data-brand="Air Jordan 1">Jordan 1</button>
+      <button class="pill" data-brand="Air Jordan 2">Jordan 2</button>
+      <button class="pill" data-brand="Air Jordan 4">Jordan 4</button>
+      <button class="pill" data-brand="Nike Dunk">Dunk</button>
+      <button class="pill" data-brand="Adidas">Adidas</button>
+      <button class="pill" data-brand="Nike">Nike</button>
+      <button class="pill" data-brand="Supreme">Supreme</button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="search" placeholder="Cerca modello...">
+    </div>
+  </div>
+
+  <!-- Brand filters — mobile only -->
+  <div class="nav-bottom" id="brandFiltersMobile">
+    <button class="pill active" data-brand="all">Tutti</button>
+    <button class="pill" data-brand="Air Jordan 1">Jordan 1</button>
+    <button class="pill" data-brand="Air Jordan 2">Jordan 2</button>
+    <button class="pill" data-brand="Air Jordan 4">Jordan 4</button>
+    <button class="pill" data-brand="Nike Dunk">Dunk</button>
+    <button class="pill" data-brand="Adidas">Adidas</button>
+    <button class="pill" data-brand="Nike">Nike</button>
+    <button class="pill" data-brand="Supreme">Supreme</button>
+  </div>
+
+  <!-- Size chips -->
+  <div class="nav-bottom">
+    <span class="filter-label">Taglia</span>
+    <div class="size-chips" id="sizeChips"></div>
+  </div>
+
+  <!-- Sort + price -->
+  <div class="nav-bottom">
+    <select class="sort-select" id="sortSelect">
+      <option value="none">Ordina</option>
+      <option value="asc">Prezzo ↑</option>
+      <option value="desc">Prezzo ↓</option>
+    </select>
+    <div class="price-range">
+      <span class="filter-label">€</span>
+      <input class="price-input" type="text" inputmode="numeric" id="priceMin" placeholder="Min">
+      <span class="price-sep">—</span>
+      <input class="price-input" type="text" inputmode="numeric" id="priceMax" placeholder="Max">
+    </div>
+  </div>
+</header>
+
+<!-- ── GRID ─────────────────────────────────────────────────── -->
+<main>
+  <div id="grid"></div>
+  <div id="empty">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <p>Nessun articolo trovato</p>
+  </div>
+</main>
+
+<!-- ── MODAL ─────────────────────────────────────────────────── -->
+<div id="modal-overlay">
+  <div id="modal">
+    <button class="modal-close-x" id="modalCloseX">✕</button>
+    <div class="modal-layout">
+
+      <!-- Carousel -->
+      <div class="modal-img-wrap">
+        <button class="carousel-btn prev" id="carouselPrev">&#8249;</button>
+        <img id="modalImg" src="" alt="">
+        <button class="carousel-btn next" id="carouselNext">&#8250;</button>
+        <div class="carousel-dots" id="carouselDots"></div>
+      </div>
+
+      <!-- Info -->
+      <div class="modal-info">
+        <div>
+          <div class="modal-brand" id="modalBrand"></div>
+          <div class="modal-name"  id="modalName"></div>
+        </div>
+        <div class="modal-desc" id="modalDesc"></div>
+        <div>
+          <div class="modal-section-title">Taglie disponibili</div>
+          <div class="sizes-grid" id="modalSizes"></div>
+        </div>
+        <div class="modal-actions">
+          <a class="btn-wa" id="modalWa" href="#" target="_blank" rel="noopener">
+            Contattami su WhatsApp
+          </a>
+          <button class="btn-close-modal" id="modalClose">Chiudi</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Costanti ────────────────────────────────────────────────
+  const STOPWORDS_TC = new Set(['di','da','del','della','dei','degli','delle','e','in','a','con','su','per']);
+
+  const BRAND_COLORS = {
+    'Air Jordan 1': { bg: '#e8c97a', fg: '#000' },
+    'Air Jordan 4': { bg: '#d4a843', fg: '#000' },
+    'Nike Dunk':    { bg: '#2ecc71', fg: '#000' },
+    'Adidas':       { bg: '#4a9eff', fg: '#000' },
+    'Nike':         { bg: '#ff7043', fg: '#000' },
+    'Supreme':      { bg: '#e84040', fg: '#fff' },
+  };
+
+  const DEFAULT_IMG = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23111' width='400' height='400'/%3E%3Cpath d='M80 260 C120 190 185 155 270 160 L350 165 C358 165 364 172 358 180 L346 192 C274 194 222 210 190 260 Z' fill='%232a2a2a'/%3E%3C/svg%3E";
+
+  // ── State ───────────────────────────────────────────────────
+  let allItems    = [];
+  let byName      = {};   // name → all items (all sizes)
+  let activeBrand  = 'all';
+  let activeSizes  = new Set(); // set vuoto = tutte
+  let currentImages = [];
+  let currentImgIdx = 0;
+
+  // ── Size normalizer ─────────────────────────────────────────
+  // "US 9W - 40.5" → "40.5",  "US 6W - 36.5" → "36.5",  "42" → "42"
+  function normalizeSize(s) {
+    if (!s) return '';
+    const m = s.match(/(\d+(?:[.,]\d+)?)\s*$/);
+    return m ? m[1].replace(',', '.') : s;
+  }
+
+  // ── Load ────────────────────────────────────────────────────
+  function initInventory(data) {
+    allItems = data;
+    allItems.forEach(item => {
+      if (!byName[item.name]) byName[item.name] = [];
+      byName[item.name].push(item);
+    });
+    buildSizeChips();
+    applyFilters();
+  }
+
+  if (window.INVENTORY) {
+    initInventory(window.INVENTORY);
+  } else {
+    fetch('./inventory.json')
+      .then(r => r.json())
+      .then(initInventory)
+      .catch(() => {
+        const empty = document.getElementById('empty');
+        empty.style.display = 'block';
+        empty.querySelector('p').textContent =
+          'Esegui make_js.py per generare inventory.js, poi riapri il file.';
+      });
+  }
+
+  // ── Size chips ──────────────────────────────────────────────
+  function buildSizeChips() {
+    const normalizedSet = new Map(); // normalizedSize → display label
+    allItems.forEach(item => {
+      const norm = normalizeSize(item.size);
+      if (norm && !normalizedSet.has(norm)) {
+        normalizedSet.set(norm, norm);
+      }
+    });
+
+    const sorted = [...normalizedSet.keys()].sort((a, b) => {
+      const na = parseFloat(a), nb = parseFloat(b);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+      return a.localeCompare(b);
+    });
+
+    const wrap = document.getElementById('sizeChips');
+    wrap.innerHTML = '<button class="chip active" data-size="all">Tutte</button>';
+    sorted.forEach(s => {
+      const btn = document.createElement('button');
+      btn.className   = 'chip';
+      btn.dataset.size = s;
+      btn.textContent  = s;
+      wrap.appendChild(btn);
+    });
+
+    wrap.addEventListener('click', e => {
+      const btn = e.target.closest('.chip');
+      if (!btn) return;
+      const s = btn.dataset.size;
+      if (s === 'all') {
+        // Tutte: resetta selezione
+        activeSizes.clear();
+      } else {
+        // Toggle taglia
+        if (activeSizes.has(s)) activeSizes.delete(s);
+        else activeSizes.add(s);
+      }
+      // Aggiorna stile chip
+      wrap.querySelectorAll('.chip').forEach(c => {
+        const cs = c.dataset.size;
+        if (cs === 'all') c.classList.toggle('active', activeSizes.size === 0);
+        else              c.classList.toggle('active', activeSizes.has(cs));
+      });
+      applyFilters();
+    });
+  }
+
+  // ── Brand filter (desktop + mobile) ────────────────────────
+  function onBrandClick(e) {
+    const btn = e.target.closest('.pill');
+    if (!btn) return;
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    // Attiva il pill corrispondente in entrambi i set
+    document.querySelectorAll(`.pill[data-brand="${btn.dataset.brand}"]`)
+      .forEach(p => p.classList.add('active'));
+    activeBrand = btn.dataset.brand;
+    applyFilters();
+  }
+  document.getElementById('brandFilters').addEventListener('click', onBrandClick);
+  document.getElementById('brandFiltersMobile').addEventListener('click', onBrandClick);
+
+  document.getElementById('search').addEventListener('input', applyFilters);
+  document.getElementById('priceMin').addEventListener('input', applyFilters);
+  document.getElementById('priceMax').addEventListener('input', applyFilters);
+  document.getElementById('sortSelect').addEventListener('change', applyFilters);
+
+  // ── Filter ──────────────────────────────────────────────────
+  function applyFilters() {
+    const q        = document.getElementById('search').value.toLowerCase().trim();
+    const minPrice = parseFloat(document.getElementById('priceMin').value) || 0;
+    const maxPrice = parseFloat(document.getElementById('priceMax').value) || Infinity;
+    const sort     = document.getElementById('sortSelect').value;
+
+    let filtered = allItems.filter(item => {
+      if (activeBrand !== 'all' && item.brand !== activeBrand) return false;
+      if (activeSizes.size > 0 && !activeSizes.has(normalizeSize(item.size))) return false;
+      if (q && !item.name.toLowerCase().includes(q)) return false;
+      if (item.resell < minPrice || item.resell > maxPrice) return false;
+      return true;
+    });
+
+    if (sort === 'asc')  filtered.sort((a, b) => a.resell - b.resell);
+    if (sort === 'desc') filtered.sort((a, b) => b.resell - a.resell);
+
+    renderGrid(filtered);
+  }
+
+  // ── Grid (deduplicated) ─────────────────────────────────────
+  function renderGrid(items) {
+    const grid  = document.getElementById('grid');
+    const empty = document.getElementById('empty');
+    grid.innerHTML = '';
+
+    if (!items.length) {
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+
+    // Group by name (maintaining order of first appearance)
+    const grouped = new Map();
+    items.forEach(item => {
+      if (!grouped.has(item.name)) grouped.set(item.name, []);
+      grouped.get(item.name).push(item);
+    });
+
+    grouped.forEach((variants, name) => {
+      const prices   = variants.map(v => v.resell);
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+      const varied   = minPrice !== maxPrice;
+
+      // Pick best representative (one with images, preferring the cheapest)
+      const rep = variants.find(v => {
+        const imgs = v.images?.length ? v.images : (v.image ? [v.image] : []);
+        return imgs.length > 0 && v.resell === minPrice;
+      }) || variants.find(v => v.resell === minPrice) || variants[0];
+
+      const imgs   = rep.images?.length ? rep.images : (rep.image ? [rep.image] : []);
+      const thumb  = imgs[0] || DEFAULT_IMG;
+      const color  = BRAND_COLORS[rep.brand] || { bg: '#555', fg: '#fff' };
+      const sizeCount = variants.length;
+
+      const priceHTML = varied
+        ? `<span class="card-price-prefix">Da</span>€${minPrice}`
+        : `€${minPrice}`;
+
+      // Quadratini taglia (max 6 mostrati)
+      const sortedSizes = variants
+        .map(v => normalizeSize(v.size))
+        .filter(Boolean)
+        .sort((a, b) => parseFloat(a) - parseFloat(b));
+      const uniqueSizes = [...new Set(sortedSizes)];
+      const sizeDotsHTML = uniqueSizes.slice(0, 6).map(s =>
+        `<span class="card-size-dot">${s}</span>`
+      ).join('');
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-img-wrap">
+          <img src="${thumb}" alt="${escHtml(name)}" loading="lazy" class="loading"
+               onerror="this.src='${DEFAULT_IMG}'" onload="this.classList.remove('loading')">
+          <span class="badge" style="background:${color.bg};color:${color.fg}">${rep.brand}</span>
+          <div class="card-sizes">${sizeDotsHTML}</div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">${escHtml(titleCase(name))}</div>
+          <div class="card-price">${priceHTML}</div>
+        </div>`;
+
+      card.addEventListener('click', () => openModal(rep, name));
+      grid.appendChild(card);
+    });
+  }
+
+  // ── Modal ───────────────────────────────────────────────────
+  function openModal(item, name) {
+    const allVariants = byName[name] || byName[item.name] || [item];
+
+    // Info
+    document.getElementById('modalBrand').textContent = item.brand;
+    document.getElementById('modalName').textContent  = titleCase(name || item.name);
+
+    // Description
+    const descEl = document.getElementById('modalDesc');
+    const desc   = item.description || '';
+    descEl.textContent = desc || '';
+    descEl.style.display = desc ? 'block' : 'none';
+
+    // WhatsApp link
+    function buildWaLink(productName, size) {
+      const msg = `Ciao, sono interessato a ${titleCase(productName)} taglia ${normalizeSize(size)}, è ancora disponibile?`;
+      return `https://wa.me/393286459799?text=${encodeURIComponent(msg)}`;
+    }
+    document.getElementById('modalWa').href = buildWaLink(item.name, item.size);
+
+    // Sizes
+    renderModalSizes(allVariants, item);
+
+    // Carousel
+    const imgs = item.images?.length ? item.images : (item.image ? [item.image] : []);
+    setupCarousel(imgs);
+
+    // Open
+    document.getElementById('modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function renderModalSizes(variants, activeItem) {
+    const wrap = document.getElementById('modalSizes');
+    wrap.innerHTML = '';
+
+    // Build map: normalizedSize → item
+    const invMap = new Map();
+    variants.forEach(v => {
+      const key = normalizeSize(v.size);
+      if (!invMap.has(key)) invMap.set(key, v);
+    });
+
+    const hasNumeric = variants.some(v => !isNaN(parseFloat(normalizeSize(v.size))));
+
+    if (hasNumeric) {
+      // Standard EU half-sizes grid
+      const EU_SIZES = [
+        '36','36.5','37.5','38','38.5','39','40','40.5',
+        '41','42','42.5','43','44','44.5','45','45.5','46','47'
+      ];
+      // Add any extra sizes from inventory not in standard list
+      invMap.forEach((_, k) => { if (!EU_SIZES.includes(k)) EU_SIZES.push(k); });
+      EU_SIZES.sort((a, b) => parseFloat(a) - parseFloat(b));
+
+      EU_SIZES.forEach(sz => {
+        const found = invMap.get(sz);
+        const btn   = document.createElement('button');
+        btn.className = 'size-btn' + (found ? '' : ' unavailable');
+        btn.innerHTML = `
+          <span class="sz">${sz}</span>
+          <span class="pr">${found ? '€' + found.resell : '—'}</span>`;
+
+        if (found) {
+          if (normalizeSize(activeItem.size) === sz) btn.classList.add('selected');
+          btn.addEventListener('click', () => {
+            wrap.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('modalWa').href = buildWaLink(item.name, found.size);
+          });
+        }
+        wrap.appendChild(btn);
+      });
+    } else {
+      // Non-numeric (M, L, XL…)
+      variants.forEach(v => {
+        const btn = document.createElement('button');
+        btn.className = 'size-btn' + (normalizeSize(v.size) === normalizeSize(activeItem.size) ? ' selected' : '');
+        btn.innerHTML = `<span class="sz">${v.size}</span><span class="pr">€${v.resell}</span>`;
+        btn.addEventListener('click', () => {
+          wrap.querySelectorAll('.size-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          document.getElementById('modalWa').href = buildWaLink(item.name, v.size);
+        });
+        wrap.appendChild(btn);
+      });
+    }
+  }
+
+  // ── Carousel ────────────────────────────────────────────────
+  function setupCarousel(images) {
+    currentImages = images.length ? images : [DEFAULT_IMG];
+    currentImgIdx = 0;
+    updateCarousel();
+  }
+
+  function updateCarousel() {
+    const img   = document.getElementById('modalImg');
+    const dots  = document.getElementById('carouselDots');
+    const prev  = document.getElementById('carouselPrev');
+    const next  = document.getElementById('carouselNext');
+    const multi = currentImages.length > 1;
+
+    // Fade transition
+    img.classList.add('fade');
+    setTimeout(() => {
+      img.src = currentImages[currentImgIdx] || DEFAULT_IMG;
+      img.onerror = () => { img.src = DEFAULT_IMG; };
+      img.classList.remove('fade');
+    }, 120);
+
+    // Arrows
+    prev.hidden = !multi;
+    next.hidden = !multi;
+
+    // Dots
+    dots.style.display = multi ? 'flex' : 'none';
+    dots.innerHTML = currentImages.map((_, i) =>
+      `<span class="dot${i === currentImgIdx ? ' active' : ''}" data-i="${i}"></span>`
+    ).join('');
+  }
+
+  document.getElementById('carouselPrev').addEventListener('click', () => {
+    currentImgIdx = (currentImgIdx - 1 + currentImages.length) % currentImages.length;
+    updateCarousel();
+  });
+  document.getElementById('carouselNext').addEventListener('click', () => {
+    currentImgIdx = (currentImgIdx + 1) % currentImages.length;
+    updateCarousel();
+  });
+  document.getElementById('carouselDots').addEventListener('click', e => {
+    const dot = e.target.closest('.dot');
+    if (!dot) return;
+    currentImgIdx = parseInt(dot.dataset.i);
+    updateCarousel();
+  });
+
+  // Touch/swipe carousel
+  let touchStartX = 0;
+  document.getElementById('modal').addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].clientX;
+  }, { passive: true });
+  document.getElementById('modal').addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) < 40 || currentImages.length <= 1) return;
+    currentImgIdx = dx < 0
+      ? (currentImgIdx + 1) % currentImages.length
+      : (currentImgIdx - 1 + currentImages.length) % currentImages.length;
+    updateCarousel();
+  }, { passive: true });
+
+  // ── Close modal ─────────────────────────────────────────────
+  function closeModal() {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.getElementById('modalClose').addEventListener('click', closeModal);
+  document.getElementById('modalCloseX').addEventListener('click', closeModal);
+  document.getElementById('modal-overlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-overlay')) closeModal();
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModal();
+    if (e.key === 'ArrowLeft' && currentImages.length > 1) {
+      currentImgIdx = (currentImgIdx - 1 + currentImages.length) % currentImages.length;
+      updateCarousel();
+    }
+    if (e.key === 'ArrowRight' && currentImages.length > 1) {
+      currentImgIdx = (currentImgIdx + 1) % currentImages.length;
+      updateCarousel();
+    }
+  });
+
+  // ── Helpers ─────────────────────────────────────────────────
+  function titleCase(str) {
+    return str.toLowerCase().split(' ').map((w, i) =>
+      i > 0 && STOPWORDS_TC.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)
+    ).join(' ');
+  }
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
