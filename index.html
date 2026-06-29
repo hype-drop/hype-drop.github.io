@@ -677,7 +677,7 @@
   // ── State ───────────────────────────────────────────────────
   let allItems    = [];
   let byName      = {};   // name → all items (all sizes)
-  let activeBrand  = 'all';
+  let activeBrands = new Set(); // set vuoto = tutti
   let activeSizes  = new Set(); // set vuoto = tutte
   let currentImages = [];
   let currentImgIdx = 0;
@@ -764,16 +764,25 @@
   }
 
   // ── Brand filter (desktop + mobile) ────────────────────────
+  function syncBrandUI() {
+    document.querySelectorAll('.pill').forEach(p => {
+      const b = p.dataset.brand;
+      if (b === 'all') p.classList.toggle('active', activeBrands.size === 0);
+      else             p.classList.toggle('active', activeBrands.has(b));
+    });
+  }
+
   function onBrandClick(e) {
     const btn = e.target.closest('.pill');
     if (!btn) return;
     const brand = btn.dataset.brand;
-    // Toggle: se già attivo (e non è "Tutti") → torna a "Tutti"
-    const newBrand = (brand !== 'all' && activeBrand === brand) ? 'all' : brand;
-    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll(`.pill[data-brand="${newBrand}"]`)
-      .forEach(p => p.classList.add('active'));
-    activeBrand = newBrand;
+    if (brand === 'all') {
+      activeBrands.clear();
+    } else {
+      if (activeBrands.has(brand)) activeBrands.delete(brand);
+      else activeBrands.add(brand);
+    }
+    syncBrandUI();
     applyFilters();
   }
   document.getElementById('brandFilters').addEventListener('click', onBrandClick);
@@ -782,15 +791,13 @@
   // ── Logo: reset tutti i filtri ──────────────────────────────
   document.getElementById('logoReset').addEventListener('click', e => {
     e.preventDefault();
-    activeBrand = 'all';
+    activeBrands.clear();
     activeSizes.clear();
     document.getElementById('search').value = '';
     document.getElementById('priceMin').value = '';
     document.getElementById('priceMax').value = '';
     document.getElementById('sortSelect').value = 'none';
-    document.querySelectorAll('.pill').forEach(p =>
-      p.classList.toggle('active', p.dataset.brand === 'all')
-    );
+    syncBrandUI();
     document.querySelectorAll('.chip').forEach(c =>
       c.classList.toggle('active', c.dataset.size === 'all')
     );
@@ -810,7 +817,7 @@
     const sort     = document.getElementById('sortSelect').value;
 
     let filtered = allItems.filter(item => {
-      if (activeBrand !== 'all' && item.brand !== activeBrand) return false;
+      if (activeBrands.size > 0 && !activeBrands.has(item.brand)) return false;
       if (activeSizes.size > 0 && !activeSizes.has(normalizeSize(item.size))) return false;
       if (q && !item.name.toLowerCase().includes(q)) return false;
       if (item.resell < minPrice || item.resell > maxPrice) return false;
