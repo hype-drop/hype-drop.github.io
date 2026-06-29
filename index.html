@@ -552,7 +552,7 @@
   <div class="nav-top">
 
     <!-- Logo -->
-    <a class="logo" href="#" style="text-decoration:none; line-height:1; display:flex; flex-direction:column; gap:0;">
+    <a class="logo" id="logoReset" href="#" style="text-decoration:none; line-height:1; display:flex; flex-direction:column; gap:0;">
       <span style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:.08em; color:var(--text);">HYPE</span>
       <span style="font-family:'Bebas Neue',Impact,sans-serif; font-size:26px; letter-spacing:.08em; color:transparent; -webkit-text-stroke:1.5px var(--text);">DROP</span>
     </a>
@@ -767,15 +767,35 @@
   function onBrandClick(e) {
     const btn = e.target.closest('.pill');
     if (!btn) return;
+    const brand = btn.dataset.brand;
+    // Toggle: se già attivo (e non è "Tutti") → torna a "Tutti"
+    const newBrand = (brand !== 'all' && activeBrand === brand) ? 'all' : brand;
     document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-    // Attiva il pill corrispondente in entrambi i set
-    document.querySelectorAll(`.pill[data-brand="${btn.dataset.brand}"]`)
+    document.querySelectorAll(`.pill[data-brand="${newBrand}"]`)
       .forEach(p => p.classList.add('active'));
-    activeBrand = btn.dataset.brand;
+    activeBrand = newBrand;
     applyFilters();
   }
   document.getElementById('brandFilters').addEventListener('click', onBrandClick);
   document.getElementById('brandFiltersMobile').addEventListener('click', onBrandClick);
+
+  // ── Logo: reset tutti i filtri ──────────────────────────────
+  document.getElementById('logoReset').addEventListener('click', e => {
+    e.preventDefault();
+    activeBrand = 'all';
+    activeSizes.clear();
+    document.getElementById('search').value = '';
+    document.getElementById('priceMin').value = '';
+    document.getElementById('priceMax').value = '';
+    document.getElementById('sortSelect').value = 'none';
+    document.querySelectorAll('.pill').forEach(p =>
+      p.classList.toggle('active', p.dataset.brand === 'all')
+    );
+    document.querySelectorAll('.chip').forEach(c =>
+      c.classList.toggle('active', c.dataset.size === 'all')
+    );
+    applyFilters();
+  });
 
   document.getElementById('search').addEventListener('input', applyFilters);
   document.getElementById('priceMin').addEventListener('input', applyFilters);

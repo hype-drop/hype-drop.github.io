@@ -1,0 +1,13 @@
+# File privati — non pubblicare su GitHub
+INVENTARIO_SNEAKERS.xlsx
+inventory.json
+GITHUB GOOGLE.txt
+LOGO.png.png
+PROMPT.txt
+PROMPT AGGIORNA EXCEL SITO.txt
+sync.py
+make_js.py
+find_goat_links.py
+FOTO INSTAGRAM/
+*.pyc
+__pycache__/
